@@ -35,10 +35,10 @@ vim.api.nvim_set_keymap('n', '<leader>tn', ':tabnext<CR>', { noremap = true, sil
 vim.api.nvim_set_keymap('n', '<leader>tp', ':tabprevious<CR>', { noremap = true, silent = true })
 
 -- For Python REPL
-vim.g.slime_target = "neovim"
+vim.g.slime_target = 'neovim'
 vim.g.slime_python_ipython = 1
 
-local slime = require('custom.plugins.slime')
+local slime = require 'custom.plugins.slime'
 
 vim.keymap.set('n', '<leader>sc', slime.send_cell, { noremap = true, silent = true })
 vim.keymap.set('n', '<leader>sl', slime.send_line, { noremap = true, silent = true })
@@ -60,5 +60,14 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 vim.opt.spelllang = 'en_us'
 vim.opt.spell = true
+-- For Obsidian
+vim.opt.conceallevel = 2
+
+function OpenTelescopeInDirectory()
+  local dir = vim.fn.input('Directory: ', '', 'dir')
+  require('telescope.builtin').find_files { cwd = dir }
+end
+
+vim.api.nvim_set_keymap('n', '<leader>sa', ':lua OpenTelescopeInDirectory()<CR>', { noremap = true, silent = true })
 
 -- vim: ts=2 sts=2 sw=2 et
