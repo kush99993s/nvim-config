@@ -32,8 +32,12 @@ return {
       -- Adds other completion capabilities.
       --  nvim-cmp does not ship with all sources by default. They are split
       --  into multiple repos for maintenance purposes.
-      'hrsh7th/cmp-nvim-lsp',
-      'hrsh7th/cmp-path',
+      'hrsh7th/nvim-cmp', -- Completion plugin,
+      'hrsh7th/cmp-buffer', -- Buffer completions
+      'hrsh7th/cmp-path', -- Path completions
+      'hrsh7th/cmp-cmdline', -- Command-line completions
+      'hrsh7th/cmp-nvim-lsp', -- LSP completions
+      'f3fora/cmp-spell', -- Spell source for nvim-cmp
     },
     config = function()
       -- See `:help cmp`
@@ -113,10 +117,10 @@ return {
         },
       }
       -- Setup up vim-dadbod
-      cmp.setup.filetype({ "sql" }, {
+      cmp.setup.filetype({ 'sql' }, {
         sources = {
-          { name = "vim-dadbod-completion" },
-          { name = "buffer" },
+          { name = 'vim-dadbod-completion' },
+          { name = 'buffer' },
         },
       })
     end,

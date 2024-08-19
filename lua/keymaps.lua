@@ -60,6 +60,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 vim.opt.spelllang = 'en_us'
 vim.opt.spell = true
+vim.opt.spellsuggest = 'best,9'
 -- For Obsidian
 vim.opt.conceallevel = 2
 
