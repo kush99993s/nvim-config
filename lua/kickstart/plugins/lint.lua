@@ -48,6 +48,7 @@ return {
 
       -- Create autocommand which carries out the actual linting
       -- on the specified events.
+
       local eslint = lint.linters.eslint_d
 
       eslint.args = {
