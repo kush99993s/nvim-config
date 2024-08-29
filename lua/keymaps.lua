@@ -71,4 +71,6 @@ end
 
 vim.api.nvim_set_keymap('n', '<leader>sa', ':lua OpenTelescopeInDirectory()<CR>', { noremap = true, silent = true })
 
+
+vim.o.scrolloff = 999
 -- vim: ts=2 sts=2 sw=2 et
