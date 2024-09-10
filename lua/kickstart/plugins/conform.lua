@@ -21,14 +21,14 @@ return {
         -- languages here or re-enable it for the disabled ones.
         local disable_filetypes = { c = true, cpp = true }
         return {
-          timeout_ms = 500,
+          timeout_ms = 1000,
           lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
         }
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
         javascript = { 'prettierd', 'prettier', stop_after_first = true },
-        typescript = { 'prettierd', 'prettier', stop_after_first = true },
+        typescript = { 'prettierd', 'prettier', 'biomejs' },
         json = { 'prettierd', 'prettier', stop_after_first = true },
         markdown = { 'prettierd', 'prettier', stop_after_first = true },
         html = { 'htmlbeautifier' },
@@ -40,7 +40,7 @@ return {
         scss = { 'prettierd', 'prettier', stop_after_first = true },
         sh = { 'shellcheck' },
         go = { 'gofmt' },
-        python = { 'black' },
+        python = { 'autopep8', 'black', 'autopep8' },
         -- Conform can also run multiple formatters sequentially
         -- python = { "isort", "black" },
         --

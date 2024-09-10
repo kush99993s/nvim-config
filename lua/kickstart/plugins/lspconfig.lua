@@ -21,7 +21,12 @@ return {
       { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
-
+      'hrsh7th/cmp-buffer',
+      'hrsh7th/cmp-path',
+      'hrsh7th/cmp-cmdline',
+      'hrsh7th/nvim-cmp',
+      'L3MON4D3/LuaSnip',
+      'saadparwaiz1/cmp_luasnip',
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
       { 'j-hui/fidget.nvim', opts = {} },
@@ -174,13 +179,17 @@ return {
       local servers = {
         -- clangd = {},
         gopls = {},
-        pyright = {},
+        --pyright = {},
         cmake = {},
         sqlls = {},
+
         angularls = {},
         cssls = {},
         biome = {},
-        
+        eslint = {},
+        jedi_language_server = {},
+        pyright = {},
+        pylyzer = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -217,7 +226,32 @@ return {
 
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
-      local ensure_installed = vim.tbl_keys(servers or {})
+      local ensure_installed = {
+        'autoflake',
+        'autopep8',
+        'biome',
+        'black',
+        'checkmake',
+        'cmake-language-server',
+        'cmakelang',
+        'eslint-lsp',
+        'eslint_d',
+        'flake8',
+        'gopls',
+        'html-lsp',
+        'lua-language-server',
+        'markdownlint',
+        'prettier',
+        'prettierd',
+        'pyflakes',
+        'pylint',
+        'rust-analyzer',
+        'jedi-language-server',
+        'pyright',
+        'pylyzer',
+        'sqlls',
+        'stylua',
+      }
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
       })
