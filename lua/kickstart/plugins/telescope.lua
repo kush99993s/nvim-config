@@ -110,7 +110,7 @@ return {
       end, { desc = '[S]earch [N]eovim files' })
 
       vim.keymap.set('n', '<leader>sm', function()
-        builtin.find_files { cwd = '~/vaults' }
+        builtin.find_files { cwd = '~/Documents/git/personal/personal_notes/' }
       end, { desc = '[S]earch [M]y notes files' })
     end,
   },

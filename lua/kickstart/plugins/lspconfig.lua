@@ -182,7 +182,6 @@ return {
         --pyright = {},
         cmake = {},
         sqlls = {},
-
         angularls = {},
         cssls = {},
         biome = {},
