@@ -33,6 +33,7 @@ return {
 
       -- Allows extra capabilities provided by nvim-cmp
       'hrsh7th/cmp-nvim-lsp',
+      'RobertBrunhage/dart-tools.nvim',
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -67,6 +68,8 @@ return {
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
         callback = function(event)
+          local filetype = vim.bo[event.buf].filetype
+          local opts = { buffer = event.buf }
           -- NOTE: Remember that Lua is a real programming language, and as such it is possible
           -- to define small helper and utility functions so you don't have to repeat yourself.
           --
@@ -112,6 +115,52 @@ return {
           -- WARN: This is not Goto Definition, this is Goto Declaration.
           --  For example, in C this would take you to the header.
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+          local dartls_config = {
+            cmd = { 'dart', 'language-server', '--protocol=lsp' },
+            filetypes = { 'dart' },
+            root_dir = require('lspconfig.util').root_pattern('pubspec.yaml', '.git'),
+            capabilities = require('cmp_nvim_lsp').default_capabilities(),
+            init_options = {
+              onlyAnalyzeProjectsWithOpenFiles = true,
+              suggestFromUnimportedLibraries = true,
+              closingLabels = true,
+              outline = true,
+              flutterOutline = true,
+            },
+            settings = {
+              dart = {
+                analysisExcludedFolders = {
+                  vim.fn.expand '$HOME/AppData/Local/Pub/Cache',
+                  vim.fn.expand '$HOME/.pub-cache',
+                  vim.fn.expand '/opt/homebrew/',
+                  vim.fn.expand '$HOME/tools/flutter/',
+                },
+                completeFunctionCalls = true,
+                showTodos = true,
+                updateImportOnRename = true,
+              },
+            },
+            on_attach = function(client, bufnr)
+              print 'Dart LSP attached!'
+              local map = function(keys, func, desc)
+                vim.keymap.set('n', keys, func, { buffer = bufnr, desc = 'LSP: ' .. desc })
+              end
+
+              map('gd', vim.lsp.buf.definition, 'Go to Definition')
+              map('K', vim.lsp.buf.hover, 'Hover Documentation')
+              map('<leader>rn', vim.lsp.buf.rename, 'Rename')
+              map('<leader>ca', vim.lsp.buf.code_action, 'Code Action')
+              map('<leader>gr', vim.lsp.buf.references, 'References')
+              map('[d', vim.diagnostic.goto_prev, 'Previous Diagnostic')
+              map(']d', vim.diagnostic.goto_next, 'Next Diagnostic')
+              map('<leader>e', vim.diagnostic.open_float, 'Open Diagnostics Float')
+
+              if client.server_capabilities.inlayHintProvider then
+                vim.lsp.inlay_hint(bufnr, true)
+              end
+            end,
+          }
+          --          require('lspconfig').dartls.setup(dartls_config)
           vim.diagnostic.config {
             virtual_text = false,
           }
@@ -176,6 +225,18 @@ return {
       --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+      --      local dartExcludedFolders = {
+      --        vim.fn.expand '$HOME/AppData/Local/Pub/Cache',
+      --        vim.fn.expand '$HOME/.pub-cache',
+      --        vim.fn.expand '/opt/homebrew/',
+      --        vim.fn.expand '$HOME/tools/flutter/',
+      --      }
+
+      --require('lspconfig').dartls.setup {
+      --  capabilities = capabilities,
+      --  cmd = { 'dart', 'language-server', '--protocol=lsp' },
+      --}
+
       local servers = {
         -- clangd = {},
         gopls = {},
@@ -189,6 +250,34 @@ return {
         jedi_language_server = {},
         pyright = {},
         pylyzer = {},
+        dcmls = {
+          cmd = { 'dcm', 'start-server' },
+          filetypes = { 'dart', 'yaml' },
+          settings = {
+            dart = {
+              analysisExcludedFolders = dartExcludedFolders,
+            },
+          },
+        },
+        --        dartls = {
+        --          cmd = { '/Users/kpatel/development/flutter/bin/dart', 'language-server', '--protocol=lsp' },
+        --          filetypes = { 'dart' },
+        --          init_options = {
+        --            onlyAnalyzeProjectsWithOpenFiles = false,
+        --            suggestFromUnimportedLibraries = true,
+        --            closingLabels = true,
+        --            outline = true,
+        --            flutterOutline = true,
+        --          },
+        --          settings = {
+        --            dart = {
+        --              analysisExcludedFolders = dartExcludedFolders,
+        --              updateImportOnRename = true,
+        --              completeFunctionCalls = true,
+        --              showTodos = true,
+        --            },
+        --          },
+        --        },
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
