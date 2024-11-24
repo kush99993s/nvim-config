@@ -68,8 +68,6 @@ return {
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
         callback = function(event)
-          local filetype = vim.bo[event.buf].filetype
-          local opts = { buffer = event.buf }
           -- NOTE: Remember that Lua is a real programming language, and as such it is possible
           -- to define small helper and utility functions so you don't have to repeat yourself.
           --
@@ -115,52 +113,11 @@ return {
           -- WARN: This is not Goto Definition, this is Goto Declaration.
           --  For example, in C this would take you to the header.
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-          local dartls_config = {
-            cmd = { 'dart', 'language-server', '--protocol=lsp' },
-            filetypes = { 'dart' },
-            root_dir = require('lspconfig.util').root_pattern('pubspec.yaml', '.git'),
-            capabilities = require('cmp_nvim_lsp').default_capabilities(),
-            init_options = {
-              onlyAnalyzeProjectsWithOpenFiles = true,
-              suggestFromUnimportedLibraries = true,
-              closingLabels = true,
-              outline = true,
-              flutterOutline = true,
-            },
-            settings = {
-              dart = {
-                analysisExcludedFolders = {
-                  vim.fn.expand '$HOME/AppData/Local/Pub/Cache',
-                  vim.fn.expand '$HOME/.pub-cache',
-                  vim.fn.expand '/opt/homebrew/',
-                  vim.fn.expand '$HOME/tools/flutter/',
-                },
-                completeFunctionCalls = true,
-                showTodos = true,
-                updateImportOnRename = true,
-              },
-            },
-            on_attach = function(client, bufnr)
-              print 'Dart LSP attached!'
-              local map = function(keys, func, desc)
-                vim.keymap.set('n', keys, func, { buffer = bufnr, desc = 'LSP: ' .. desc })
-              end
+          map('<leader>hd', vim.lsp.buf.hover, '[H]over [D]ocumentation')
+          map('Nd', vim.diagnostic.goto_prev, 'Previous [D]iagnostic')
+          map('nd', vim.diagnostic.goto_next, 'Next [D]iagnostic')
+          map('<leader>e', vim.diagnostic.open_float, 'Open Diagnostics Float')
 
-              map('gd', vim.lsp.buf.definition, 'Go to Definition')
-              map('K', vim.lsp.buf.hover, 'Hover Documentation')
-              map('<leader>rn', vim.lsp.buf.rename, 'Rename')
-              map('<leader>ca', vim.lsp.buf.code_action, 'Code Action')
-              map('<leader>gr', vim.lsp.buf.references, 'References')
-              map('[d', vim.diagnostic.goto_prev, 'Previous Diagnostic')
-              map(']d', vim.diagnostic.goto_next, 'Next Diagnostic')
-              map('<leader>e', vim.diagnostic.open_float, 'Open Diagnostics Float')
-
-              if client.server_capabilities.inlayHintProvider then
-                vim.lsp.inlay_hint(bufnr, true)
-              end
-            end,
-          }
-          --          require('lspconfig').dartls.setup(dartls_config)
           vim.diagnostic.config {
             virtual_text = false,
           }
@@ -250,6 +207,12 @@ return {
         jedi_language_server = {},
         pyright = {},
         pylyzer = {},
+        zls = {},
+        ltex = {
+          cmd = { 'ltex-ls' },
+          filetypes = { 'markdown', 'text' },
+          flags = { debounce_text_changes = 300 },
+        },
         dcmls = {
           cmd = { 'dcm', 'start-server' },
           filetypes = { 'dart', 'yaml' },
