@@ -59,7 +59,7 @@ require('lazy').setup({
 
   require 'kickstart/plugins/lint',
 
-  require 'kickstart/plugins/typescript-lsp',
+  --  require 'kickstart/plugins/typescript-lsp',
 
   require 'kickstart/plugins/vim-tumx-navig',
 
