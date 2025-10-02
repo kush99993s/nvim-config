@@ -205,7 +205,7 @@ return {
         biome = {},
         jedi_language_server = {},
         pyright = {},
-        --       pylyzer = {},
+        pylyzer = {},
         tsserver = {},
         zls = {},
         ltex = {

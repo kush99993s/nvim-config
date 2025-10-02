@@ -40,10 +40,10 @@ vim.g.slime_python_ipython = 1
 
 local slime = require 'custom.plugins.slime'
 
-vim.keymap.set('n', '<leader>sc', slime.send_cell, { noremap = true, silent = true })
-vim.keymap.set('n', '<leader>sl', slime.send_line, { noremap = true, silent = true })
-vim.keymap.set('v', '<leader>sv', slime.send_visual, { noremap = true, silent = true })
-
+vim.keymap.set('n', '<leader>ic', slime.send_cell, { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>il', slime.send_line, { noremap = true, silent = true })
+vim.keymap.set('v', '<leader>iv', slime.send_visual, { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>ih', slime.send_whole, { noremap = true, silent = true })
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -70,7 +70,6 @@ function OpenTelescopeInDirectory()
 end
 
 vim.api.nvim_set_keymap('n', '<leader>sa', ':lua OpenTelescopeInDirectory()<CR>', { noremap = true, silent = true })
-
 
 vim.o.scrolloff = 999
 -- vim: ts=2 sts=2 sw=2 et
