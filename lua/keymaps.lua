@@ -50,6 +50,14 @@ vim.keymap.set('n', '<leader>ih', slime.send_whole, { noremap = true, silent = t
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
 --  See `:help vim.highlight.on_yank()`
+vim.keymap.set('n', '<leader>dbc', ':DBConnect<CR>', { desc = 'Connect to database' })
+vim.keymap.set('n', '<leader>dbr', ':DBRun<CR>', { desc = 'Run SQL query' })
+vim.keymap.set('n', '<leader>dbs', ':DBSave<CR>', { desc = 'Save SQL query' })
+vim.keymap.set('n', '<leader>dbsy', ':DBSync<CR>', { desc = 'Sync database cache' })
+vim.keymap.set('n', '<leader>dbf', ':DBRefresh<CR>', { desc = 'Refresh database cache' })
+vim.keymap.set('n', '<leader>dbl', ':DBList<CR>', { desc = 'List databases' })
+vim.keymap.set('n', '<leader>dbv', ':DBVersion<CR>', { desc = 'Show version' })
+
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),

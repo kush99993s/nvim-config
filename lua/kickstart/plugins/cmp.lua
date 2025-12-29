@@ -117,8 +117,10 @@ return {
         },
       }
       -- Setup up vim-dadbod
-      cmp.setup.filetype({ 'sql' }, {
+      cmp.setup.filetype({ 'sql', 'pgsql' }, {
         sources = {
+
+          { name = 'dbconnector', priority = 1000 }, -- Add this!
           { name = 'vim-dadbod-completion' },
           { name = 'buffer' },
         },

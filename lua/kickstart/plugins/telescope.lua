@@ -110,9 +110,33 @@ return {
         builtin.find_files { cwd = vim.fn.stdpath 'config' }
       end, { desc = '[S]earch [N]eovim files' })
 
-      vim.keymap.set('n', '<leader>sm', function()
-        builtin.find_files { cwd = '~/Documents/git/personal/personal_notes/' }
+      vim.keymap.set('n', '<leader>sp', function()
+        builtin.find_files { cwd = '~/Documents/git/personal/personal_notes/personal' }
       end, { desc = '[S]earch [M]y notes files' })
+
+      vim.keymap.set('n', '<leader>st', function()
+        builtin.find_files { cwd = '~/Documents/git/personal/personal_notes/tech' }
+      end, { desc = '[S]earch [T]ech' })
+
+      vim.keymap.set('n', '<leader>sw', function()
+        builtin.find_files { cwd = '~/Documents/git/personal/personal_notes/work/' }
+      end, { desc = '[S]earch [W]ork notes files' })
+
+      vim.keymap.set('n', '<leader>seg', function()
+        require('telescope.builtin').live_grep {
+          cwd = vim.fn.expand '~/Documents/git/personal/personal_notes',
+        }
+      end, { desc = '[S]earch p[E]rsonal [G]rep files' })
+
+      vim.keymap.set('n', '<leader>sq', function()
+        builtin.find_files { cwd = '~/.config/dbconnector/sqlfile' }
+      end, { desc = '[S]earch s[Q]l files' })
+
+      vim.keymap.set('n', '<leader>slg', function()
+        require('telescope.builtin').live_grep {
+          cwd = vim.fn.expand '~/.config/dbconnector/sqlfile',
+        }
+      end, { desc = '[S]earch sq[L] [G]rep files' })
     end,
   },
 }

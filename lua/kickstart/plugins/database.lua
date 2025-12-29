@@ -1,7 +1,8 @@
 return {
   'kristijanhusak/vim-dadbod-ui',
   dependencies = {
-    { 'tpope/vim-dadbod', lazy = true },
+    --{ 'tpope/vim-dadbod', lazy = true , branch = 'your-branch-name'},
+    { 'hdemers/vim-dadbod', lazy = true, branch = 'add-presto-password' },
     { 'kristijanhusak/vim-dadbod-completion', ft = { 'sql', 'mysql', 'plsql' }, lazy = true }, -- Optional
   },
   cmd = {

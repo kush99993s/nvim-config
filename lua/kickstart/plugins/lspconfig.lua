@@ -199,7 +199,7 @@ return {
         gopls = {},
         --pyright = {},
         cmake = {},
-        sqlls = {},
+        --        sqlls = {},
         angularls = {},
         cssls = {},
         biome = {},
@@ -300,7 +300,7 @@ return {
         'jedi-language-server',
         'pyright',
         --'pylyzer',
-        'sqlls',
+        --'sqlls',
         'stylua',
       }
       vim.list_extend(ensure_installed, {
