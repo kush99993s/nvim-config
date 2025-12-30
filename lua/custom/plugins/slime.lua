@@ -159,7 +159,7 @@ function M.send_visual()
   local lines = vim.api.nvim_buf_get_lines(bufnr, start_line - 1, end_line, false)
   local text = table.concat(lines, '\n')
   queue_send(text)
-endz
+end
 
 -- Clear the queue (useful if something gets stuck)
 function M.clear_queue()
