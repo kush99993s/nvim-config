@@ -2,10 +2,6 @@ local M = {}
 -- if you get Session/line number was not unique in database. then it is related to ipython
 -- Function to send code from #%% to the next #%% or end of file
 
--- Queue for managing code chunks
-local send_queue = {}
-local is_sending = false
-
 -- Flexible cell marker pattern: # followed by only spaces and % (at least 2 %)
 -- Matches: #%%, # %%, # %%%,  #  %  %, etc.
 -- Does NOT match: #abc%%, #.%%, etc.
@@ -24,37 +20,16 @@ local function is_cell_marker(line)
   return count >= 2
 end
 
--- Process the queue - sends next chunk after a delay
-local function process_queue()
-  if #send_queue == 0 then
-    is_sending = false
-    return
-  end
-
-  is_sending = true
-  local text = table.remove(send_queue, 1)
-
+-- Send code directly to IPython using %cpaste
+local function send_to_ipython(text)
   local ok, err = pcall(function()
-    -- Use %cpaste for clean multi-line handling in ipython
     vim.fn['slime#send']('%cpaste -q\n' .. text .. '\n--\n')
   end)
-
   if not ok then
     vim.notify('Error sending content: ' .. err, vim.log.levels.ERROR)
+    return false
   end
-
-  -- Wait before processing next item (adjust delay as needed)
-  vim.defer_fn(function()
-    process_queue()
-  end, 100)
-end
-
--- Queue text for sending
-local function queue_send(text)
-  table.insert(send_queue, text)
-  if not is_sending then
-    process_queue()
-  end
+  return true
 end
 
 -- Send entire buffer as one block
@@ -63,25 +38,25 @@ function M.send_whole()
   local total = vim.api.nvim_buf_line_count(bufnr)
   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, total, false)
   local text = table.concat(lines, '\n')
-  queue_send(text)
+  send_to_ipython(text)
 end
 
--- Send all cells in document one by one (each cell queued separately)
-function M.send_all_cells()
+-- Send all cells in document one by one with delay between each
+function M.send_all_cells(delay_ms)
+  delay_ms = delay_ms or 1000 -- default 1 second between cells
+
   local bufnr = vim.api.nvim_get_current_buf()
   local total_lines = vim.api.nvim_buf_line_count(bufnr)
   local lines = vim.api.nvim_buf_get_lines(bufnr, 0, total_lines, false)
 
+  -- Collect all cells
+  local cells = {}
   local current_cell = {}
-  local cells_sent = 0
 
-  for i, line in ipairs(lines) do
+  for _, line in ipairs(lines) do
     if is_cell_marker(line) then
-      -- Send accumulated cell content
       if #current_cell > 0 then
-        local cell_text = table.concat(current_cell, '\n')
-        queue_send(cell_text)
-        cells_sent = cells_sent + 1
+        table.insert(cells, table.concat(current_cell, '\n'))
       end
       current_cell = {}
     else
@@ -89,14 +64,36 @@ function M.send_all_cells()
     end
   end
 
-  -- Send last cell if any content remains
+  -- Last cell
   if #current_cell > 0 then
-    local cell_text = table.concat(current_cell, '\n')
-    queue_send(cell_text)
-    cells_sent = cells_sent + 1
+    table.insert(cells, table.concat(current_cell, '\n'))
   end
 
-  vim.notify('Queued ' .. cells_sent .. ' cells', vim.log.levels.INFO)
+  if #cells == 0 then
+    vim.notify('No cells found', vim.log.levels.WARN)
+    return
+  end
+
+  vim.notify('Sending ' .. #cells .. ' cells...', vim.log.levels.INFO)
+
+  -- Send cells with delay
+  local idx = 1
+  local function send_next()
+    if idx > #cells then
+      vim.notify('All ' .. #cells .. ' cells sent', vim.log.levels.INFO)
+      return
+    end
+    send_to_ipython(cells[idx])
+    idx = idx + 1
+    if idx <= #cells then
+      vim.defer_fn(send_next, delay_ms)
+    else
+      vim.defer_fn(function()
+        vim.notify('All ' .. #cells .. ' cells sent', vim.log.levels.INFO)
+      end, 100)
+    end
+  end
+  send_next()
 end
 
 function M.send_cell()
@@ -134,16 +131,14 @@ function M.send_cell()
   end
 
   local cell_text = table.concat(cell_content, '\n')
-
-  -- Queue the cell content for sending
-  queue_send(cell_text)
+  send_to_ipython(cell_text)
 end
 
 -- Function to send the current line
 function M.send_line()
   local line = vim.api.nvim_get_current_line()
   if line and line ~= '' then
-    queue_send(line)
+    send_to_ipython(line)
   end
 end
 
@@ -158,14 +153,7 @@ function M.send_visual()
   local bufnr = vim.api.nvim_get_current_buf()
   local lines = vim.api.nvim_buf_get_lines(bufnr, start_line - 1, end_line, false)
   local text = table.concat(lines, '\n')
-  queue_send(text)
-end
-
--- Clear the queue (useful if something gets stuck)
-function M.clear_queue()
-  send_queue = {}
-  is_sending = false
-  vim.notify('Send queue cleared', vim.log.levels.INFO)
+  send_to_ipython(text)
 end
 
 return M
