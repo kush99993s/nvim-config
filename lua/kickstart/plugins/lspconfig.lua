@@ -205,7 +205,12 @@ return {
         biome = {},
         jedi_language_server = {},
         pyright = {},
-        pylyzer = {},
+        --        pylyzer = {
+        --  cmd = { '--server' },
+        --  cmd_env = {
+        --    ERG_PATH = vim.fn.expand '/Users/kpatel/.cargo/bin/erg',
+        --  },
+        --},
         tsserver = {},
         zls = {},
         ltex = {
