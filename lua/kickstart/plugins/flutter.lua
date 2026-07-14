@@ -22,11 +22,6 @@ return {
         autostart = true, -- autostart devtools server if not detected
         auto_open_browser = true, -- Automatically opens devtools in the browser
       },
-      lsp = {
-        color = { -- show the derived colours for dart variables
-          enabled = true, -- whether or not to highlight color variables at all, only supported on flutter >= 2.10
-        },
-      },
     }
   end,
 }
