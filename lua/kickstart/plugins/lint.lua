@@ -12,6 +12,7 @@ return {
         html = { 'htmlhint' },
         --javascript = { 'biomejs', 'eslint_d' },
         python = { 'flake8' },
+        sql = { 'sqlfluff' },
       }
 
       -- To allow other plugins to add linters to require('lint').linters_by_ft,

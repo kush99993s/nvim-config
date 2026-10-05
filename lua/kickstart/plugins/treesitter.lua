@@ -21,6 +21,7 @@ return {
         'json',
         'typescript',
         'yaml',
+        'sql',
       },
       -- Autoinstall languages that are not installed
       auto_install = true,

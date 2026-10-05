@@ -1,5 +1,8 @@
 return {
+  -- Local dev checkout (lazy.nvim skips git update for `dir` plugins).
+  -- To install from GitHub instead, remove the `dir` line and run :Lazy sync.
   'kush99993s/dbconnector',
+  dir = vim.fn.expand('~/Documents/git/personal/dbconnector'),
   dependencies = {},
   build = './build.sh',
   config = function()
