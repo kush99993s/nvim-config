@@ -313,16 +313,27 @@ return {
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
+      -- NOTE: mason-lspconfig v2 removed the `handlers` option, so the old
+      -- `require('lspconfig')[name].setup(...)` loop silently did nothing.
+      -- Servers are now configured with `vim.lsp.config` and started by
+      -- mason-lspconfig's `automatic_enable`.
+      --
+      -- The '*' entry is merged into every server config.
+      vim.lsp.config('*', {
+        capabilities = capabilities,
+      })
+
+      for server_name, server_config in pairs(servers) do
+        vim.lsp.config(server_name, server_config)
+      end
+
       require('mason-lspconfig').setup {
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for tsserver)
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
-          end,
+        automatic_enable = {
+          -- stylua is a *formatter*, run through conform.nvim -- not a language
+          -- server. nvim-lspconfig ships an `lsp/stylua.lua` that spawns
+          -- `stylua --lsp`, which older stylua builds reject (exit code 2) on
+          -- every Lua buffer with a `.stylua.toml` nearby.
+          exclude = { 'stylua' },
         },
       }
     end,

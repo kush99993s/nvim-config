@@ -1,5 +1,9 @@
+-- Codex: macOS only (see copilot.lua).
+local is_mac = vim.fn.has 'mac' == 1
+
 return {
   'nwiizo/codex.nvim',
+  cond = is_mac,
   event = 'VeryLazy', -- load before selecting text to show Ask/Edit hints
   cmd = {
     'Codex',

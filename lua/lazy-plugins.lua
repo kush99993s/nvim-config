@@ -23,6 +23,8 @@ require('lazy').setup({
   -- modular approach: using `require 'path/name'` will
   -- include a plugin definition from file lua/path/name.lua
 
+  require 'kickstart/plugins/quarto',
+
   require 'kickstart/plugins/codex',
 
   require 'kickstart/plugins/claude',
