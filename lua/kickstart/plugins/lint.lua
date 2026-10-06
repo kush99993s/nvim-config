@@ -63,12 +63,31 @@ return {
       --        end,
       --      }
 
+      -- Only run linters whose executable actually exists. Without this a
+      -- missing tool (sqlfluff, stylelint, ...) throws
+      -- "Error running <linter>: ENOENT" on every BufEnter -- including netrw
+      -- and other scratch buffers, which is where it is most confusing.
+      local function lint_if_available()
+        if vim.bo.buftype ~= '' then
+          return -- netrw, terminals, quickfix, help, ...
+        end
+
+        local names = lint.linters_by_ft[vim.bo.filetype] or {}
+        local runnable = vim.tbl_filter(function(name)
+          local linter = lint.linters[name]
+          local cmd = type(linter) == 'table' and linter.cmd or nil
+          return type(cmd) == 'string' and vim.fn.executable(cmd) == 1
+        end, names)
+
+        if #runnable > 0 then
+          lint.try_lint(runnable)
+        end
+      end
+
       local lint_augroup = vim.api.nvim_create_augroup('lint', { clear = true })
       vim.api.nvim_create_autocmd({ 'BufEnter', 'BufWritePost', 'InsertLeave' }, {
         group = lint_augroup,
-        callback = function()
-          lint.try_lint()
-        end,
+        callback = lint_if_available,
       })
 
       vim.keymap.set('n', '<leader>ll', function()

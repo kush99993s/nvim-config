@@ -31,8 +31,9 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
-vim.api.nvim_set_keymap('n', '<leader>tn', ':tabnext<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>tp', ':tabprevious<CR>', { noremap = true, silent = true })
+-- NOTE: tab navigation lives on the built-in `gt` / `gT`. The old
+-- <leader>tn / <leader>tp pair collided with vim-test (<leader>tn was being
+-- silently overwritten by :TestNearest), so it is gone.
 
 -- For Python REPL
 vim.g.slime_target = 'neovim'
@@ -50,19 +51,66 @@ vim.keymap.set('n', '<leader>ih', slime.send_whole, { noremap = true, silent = t
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
 --  See `:help vim.highlight.on_yank()`
-vim.keymap.set('n', '<leader>dbc', ':DBConnect<CR>', { desc = 'Connect to database' })
-vim.keymap.set('n', '<leader>dbr', ':DBRun<CR>', { desc = 'Run SQL query' })
-vim.keymap.set('n', '<leader>dbs', ':DBSave<CR>', { desc = 'Save SQL query' })
-vim.keymap.set('n', '<leader>dbsy', ':DBSync<CR>', { desc = 'Sync database cache' })
-vim.keymap.set('n', '<leader>dbf', ':DBRefresh<CR>', { desc = 'Refresh database cache' })
-vim.keymap.set('n', '<leader>dbl', ':DBList<CR>', { desc = 'List databases' })
-vim.keymap.set('n', '<leader>dbv', ':DBVersion<CR>', { desc = 'Show version' })
+-- [[ dbconnector ]]
+--
+-- NOTE: <leader>dbs used to be a prefix of <leader>dbsy, so DBSave always
+-- stalled for 'timeoutlen' before firing. Sync/Resync moved to shift keys.
+--
+-- NOTE: the results window and the history float register their own
+-- buffer-local keys (f/F/r/s/n/p/u/[/]/q and <CR>, /, <BS>, q, <Esc>), so
+-- filtering, CSV export and paging are deliberately not bound here.
+local function dbmap(lhs, rhs, desc, opts)
+  opts = vim.tbl_extend('force', { desc = 'DB: ' .. desc, silent = true }, opts or {})
+  vim.keymap.set(opts.mode or 'n', '<leader>db' .. lhs, rhs, opts)
+end
+
+-- Global: connection + metadata, useful from any buffer.
+dbmap('c', ':DBConnect<CR>', 'Connect')
+dbmap('l', ':DBList<CR>', 'List databases')
+dbmap('a', ':DBSetActive ', 'Set active database', { silent = false }) -- takes an argument
+dbmap('A', ':DBShowActive<CR>', 'Show active database')
+dbmap('t', ':DBBrowseTables<CR>', 'Browse tables')
+dbmap('h', ':DBSelectRun<CR>', 'Query history')
+dbmap('S', ':DBSync<CR>', 'Sync metadata')
+dbmap('R', ':DBResync<CR>', 'Full resync')
+dbmap('f', ':DBRefresh<CR>', 'Refresh cache')
+dbmap('k', ':DBCacheStats<CR>', 'Cache stats')
+dbmap('n', ':DBNewFile<CR>', 'New query file')
+dbmap('g', ':DBLogs<CR>', 'Show logs')
+dbmap('u', ':DBUnlock<CR>', 'Unlock stale cache locks')
+dbmap('P', ':DBRepairBackend<CR>', 'Repair backend')
+dbmap('v', ':DBVersion<CR>', 'Version')
+
+-- SQL buffers only: everything that acts on the query under the cursor.
+vim.api.nvim_create_autocmd('FileType', {
+  desc = 'dbconnector query keymaps',
+  group = vim.api.nvim_create_augroup('kickstart-dbconnector', { clear = true }),
+  pattern = { 'sql', 'pgsql', 'mysql', 'plsql' },
+  callback = function(event)
+    local function map(lhs, rhs, desc, mode)
+      vim.keymap.set(mode or 'n', '<leader>db' .. lhs, rhs, {
+        buffer = event.buf,
+        silent = true,
+        desc = 'DB: ' .. desc,
+      })
+    end
+
+    map('r', ':DBRun<CR>', 'Run whole buffer')
+    map('e', ':DBRunCurrent<CR>', 'Run query at cursor')
+    map('r', ':DBRunSelected<CR>', 'Run selection', 'v')
+    map('s', ':DBSave<CR>', 'Save query')
+    map('x', ':DBExpandWildcard<CR>', 'Expand * to columns')
+    map('C', ':DBShowColumns<CR>', 'Show table columns')
+  end,
+})
 
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
   group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
   callback = function()
-    vim.highlight.on_yank()
+    -- vim.highlight was renamed to vim.hl in Neovim 0.11
+    local hl = vim.hl or vim.highlight
+    hl.on_yank()
   end,
 })
 
@@ -79,5 +127,5 @@ end
 
 vim.api.nvim_set_keymap('n', '<leader>sa', ':lua OpenTelescopeInDirectory()<CR>', { noremap = true, silent = true })
 
-vim.o.scrolloff = 999
+-- NOTE: scrolloff is set once, in options.lua.
 -- vim: ts=2 sts=2 sw=2 et

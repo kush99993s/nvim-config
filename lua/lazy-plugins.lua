@@ -55,8 +55,6 @@ require('lazy').setup({
 
   require 'kickstart/plugins/copilot-chat',
 
-  require 'kickstart/plugins/database',
-
   'jpalardy/vim-slime',
 
   require 'kickstart/plugins/personal_note_taking',

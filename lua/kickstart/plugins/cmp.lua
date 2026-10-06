@@ -32,7 +32,6 @@ return {
       -- Adds other completion capabilities.
       --  nvim-cmp does not ship with all sources by default. They are split
       --  into multiple repos for maintenance purposes.
-      'hrsh7th/nvim-cmp', -- Completion plugin,
       'hrsh7th/cmp-buffer', -- Buffer completions
       'hrsh7th/cmp-path', -- Path completions
       'hrsh7th/cmp-cmdline', -- Command-line completions

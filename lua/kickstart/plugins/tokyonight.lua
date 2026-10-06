@@ -24,6 +24,8 @@ return {
   lazy = false,
   priority = 1000,
   config = function()
-    vim.cmd.colorscheme 'Carbonfox'
+    -- nightfox registers its schemes lowercase (carbonfox, terafox, ...).
+    -- 'Carbonfox' only resolves by luck on a case-insensitive filesystem.
+    vim.cmd.colorscheme 'carbonfox'
   end,
 }

@@ -60,6 +60,7 @@ vim.opt.inccommand = 'split'
 vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 10
+-- 999 effectively keeps the cursor line centred.
+vim.opt.scrolloff = 999
 
 -- vim: ts=2 sts=2 sw=2 et

@@ -7,7 +7,7 @@ return {
       {
         '<leader>f',
         function()
-          require('conform').format { async = true, lsp_fallback = true }
+          require('conform').format { async = true, lsp_format = 'fallback' }
         end,
         mode = '',
         desc = '[F]ormat buffer',
@@ -16,36 +16,37 @@ return {
     opts = {
       notify_on_error = false,
       format_on_save = function(bufnr)
-        -- Disable "format_on_save lsp_fallback" for languages that don't
+        -- Disable "format_on_save lsp_format" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
         local disable_filetypes = { c = true, cpp = true }
         return {
           timeout_ms = 1000,
-          lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
+          lsp_format = disable_filetypes[vim.bo[bufnr].filetype] and 'never' or 'fallback',
         }
       end,
+      -- NOTE: every formatter below must exist in `conform.formatters` AND be
+      -- installed (see the Mason list in lspconfig.lua). `stop_after_first`
+      -- means "first one that is installed wins" -- without it conform runs
+      -- *all* of them in sequence and they fight over the buffer.
       formatters_by_ft = {
         lua = { 'stylua' },
-        javascript = { 'prettierd', 'prettier', stop_after_first = true },
-        typescript = { 'prettierd', 'prettier', 'biomejs' },
+        javascript = { 'prettierd', 'prettier', 'biome', stop_after_first = true },
+        typescript = { 'prettierd', 'prettier', 'biome', stop_after_first = true },
         json = { 'prettierd', 'prettier', stop_after_first = true },
         markdown = { 'prettierd', 'prettier', stop_after_first = true },
-        html = { 'htmlbeautifier' },
-        bash = { 'beautysh' },
-        proto = { 'buf' },
-        yaml = { 'yamlfix' },
-        toml = { 'taplo' },
+        html = { 'prettierd', 'prettier', stop_after_first = true },
+        yaml = { 'prettierd', 'prettier', stop_after_first = true },
         css = { 'prettierd', 'prettier', stop_after_first = true },
         scss = { 'prettierd', 'prettier', stop_after_first = true },
-        sh = { 'shellcheck' },
+        sh = { 'shfmt' },
+        bash = { 'shfmt' },
+        toml = { 'taplo' },
+        proto = { 'buf' },
         go = { 'gofmt' },
-        python = { 'autopep8', 'black', 'autopep8' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use 'stop_after_first' to run the first available formatter from the list
-        -- javascript = { "prettierd", "prettier", stop_after_first = true },
+        sql = { 'sqlfluff' },
+        -- One Python formatter, not three: black and autopep8 undo each other.
+        python = { 'black' },
       },
     },
   },

@@ -306,11 +306,15 @@ return {
         'pyright',
         --'pylyzer',
         'sqlls',
-        'stylua',
-      }
-      vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
-      })
+        -- Formatters referenced by conform.nvim
+        'shfmt', -- sh / bash
+        'taplo', -- toml
+        'buf', -- proto
+        -- Linters referenced by nvim-lint
+        'sqlfluff', -- sql (also used as the sql formatter)
+        'stylelint', -- css
+      }
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       -- NOTE: mason-lspconfig v2 removed the `handlers` option, so the old
@@ -325,6 +329,16 @@ return {
 
       for server_name, server_config in pairs(servers) do
         vim.lsp.config(server_name, server_config)
+      end
+
+      -- `automatic_enable` below only starts servers that Mason installed, so
+      -- enable the hand-rolled ones (dcmls, angularls, ...) here. Guarded on the
+      -- executable existing, which is what lspconfig's old setup() did for us.
+      for server_name in pairs(servers) do
+        local cmd = (vim.lsp.config[server_name] or {}).cmd
+        if type(cmd) == 'function' or (type(cmd) == 'table' and vim.fn.executable(cmd[1]) == 1) then
+          vim.lsp.enable(server_name)
+        end
       end
 
       require('mason-lspconfig').setup {

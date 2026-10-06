@@ -118,7 +118,9 @@ return {
         builtin.find_files { cwd = '~/Documents/git/personal/personal_notes/tech' }
       end, { desc = '[S]earch [T]ech' })
 
-      vim.keymap.set('n', '<leader>sw', function()
+      -- NOTE: <leader>sw is [S]earch current [W]ord above; work notes moved to
+      -- <leader>sW so the two stop clobbering each other.
+      vim.keymap.set('n', '<leader>sW', function()
         builtin.find_files { cwd = '~/Documents/git/personal/personal_notes/work/' }
       end, { desc = '[S]earch [W]ork notes files' })
 
