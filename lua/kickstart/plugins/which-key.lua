@@ -29,6 +29,8 @@ return {
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>t', group = '[T]est / [T]oggle' },
         { '<leader>db', group = '[D]ata[B]ase' },
+        { '<leader>x', group = 'Code[X] (Codex)' },
+        { '<leader>p', group = 'Co[P]ilot' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
       }
     end,

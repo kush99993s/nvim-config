@@ -8,6 +8,7 @@ return {
   cmd = {
     'Codex',
     'CodexOpen',
+    'CodexClose',
     'CodexFocus',
     'CodexResume',
     'CodexContinue',

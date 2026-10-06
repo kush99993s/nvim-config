@@ -128,4 +128,91 @@ end
 vim.api.nvim_set_keymap('n', '<leader>sa', ':lua OpenTelescopeInDirectory()<CR>', { noremap = true, silent = true })
 
 -- NOTE: scrolloff is set once, in options.lua.
+
+-- [[ AI assistants ]]
+--
+-- Claude Code, Codex and Copilot are macOS-only (see the `cond` in their plugin
+-- specs), so the mappings are gated the same way -- otherwise Linux would get
+-- keys that resolve to commands that do not exist.
+--
+--   <leader>a  Claude Code   (most live in kickstart/plugins/claude.lua `keys`)
+--   <leader>x  Codex
+--   <leader>p  Copilot / CopilotChat
+if vim.fn.has 'mac' == 1 then
+  local function aimap(lhs, rhs, desc, mode)
+    vim.keymap.set(mode or 'n', lhs, rhs, { silent = true, desc = desc })
+  end
+
+  -- Claude Code -------------------------------------------------------------
+  -- Toggle/focus/resume/continue/model/add-buffer/send/diff-accept/deny are
+  -- defined as lazy `keys` in kickstart/plugins/claude.lua; these are the rest.
+  aimap('<leader>ao', '<cmd>ClaudeCodeOpen<cr>', 'Claude: open')
+  aimap('<leader>aq', '<cmd>ClaudeCodeClose<cr>', 'Claude: close')
+  aimap('<leader>ai', '<cmd>ClaudeCodeStatus<cr>', 'Claude: status')
+  aimap('<leader>aA', '<cmd>ClaudeCodeCloseAllDiffs<cr>', 'Claude: close all diffs')
+
+  -- Codex -------------------------------------------------------------------
+  aimap('<leader>xx', '<cmd>Codex<cr>', 'Codex: toggle')
+  aimap('<leader>xo', '<cmd>CodexOpen<cr>', 'Codex: open')
+  aimap('<leader>xq', '<cmd>CodexClose<cr>', 'Codex: close')
+  aimap('<leader>xf', '<cmd>CodexFocus<cr>', 'Codex: focus')
+  aimap('<leader>xr', '<cmd>CodexResume<cr>', 'Codex: resume session')
+  aimap('<leader>xc', '<cmd>CodexContinue<cr>', 'Codex: continue')
+  aimap('<leader>xa', '<cmd>CodexAsk<cr>', 'Codex: ask')
+  aimap('<leader>xa', '<cmd>CodexAskVisual<cr>', 'Codex: ask about selection', 'v')
+  aimap('<leader>xs', '<cmd>CodexSend<cr>', 'Codex: send buffer')
+  aimap('<leader>xs', '<cmd>CodexSendVisual<cr>', 'Codex: send selection', 'v')
+  aimap('<leader>xb', '<cmd>CodexAdd<cr>', 'Codex: add buffer to context')
+  aimap('<leader>xb', '<cmd>CodexAddVisual<cr>', 'Codex: add selection to context', 'v')
+  aimap('<leader>xe', '<cmd>CodexEdit<cr>', 'Codex: edit')
+  aimap('<leader>xv', '<cmd>CodexReview<cr>', 'Codex: review')
+  aimap('<leader>xd', '<cmd>CodexDiff<cr>', 'Codex: diff')
+  aimap('<leader>xF', '<cmd>CodexFollowUp<cr>', 'Codex: follow up')
+  aimap('<leader>xi', '<cmd>CodexInterrupt<cr>', 'Codex: interrupt')
+  aimap('<leader>xk', '<cmd>CodexStop<cr>', 'Codex: stop')
+  aimap('<leader>xS', '<cmd>CodexStatus<cr>', 'Codex: status')
+  aimap('<leader>xh', '<cmd>CodexHealth<cr>', 'Codex: health')
+
+  -- Copilot (github/copilot.vim) --------------------------------------------
+  aimap('<leader>pe', '<cmd>Copilot enable<cr>', 'Copilot: enable')
+  aimap('<leader>pd', '<cmd>Copilot disable<cr>', 'Copilot: disable')
+  aimap('<leader>ps', '<cmd>Copilot status<cr>', 'Copilot: status')
+  aimap('<leader>pp', '<cmd>Copilot panel<cr>', 'Copilot: suggestion panel')
+
+  -- CopilotChat -------------------------------------------------------------
+  -- Core commands live in the plugin's plugin/CopilotChat.lua; the per-prompt
+  -- ones (:CopilotChatExplain, ...) are generated from the prompt list during
+  -- setup().
+  aimap('<leader>pc', '<cmd>CopilotChatToggle<cr>', 'CopilotChat: toggle')
+  aimap('<leader>pr', '<cmd>CopilotChatReset<cr>', 'CopilotChat: reset')
+  aimap('<leader>pk', '<cmd>CopilotChatStop<cr>', 'CopilotChat: stop')
+  aimap('<leader>pm', '<cmd>CopilotChatModels<cr>', 'CopilotChat: select model')
+  aimap('<leader>pP', '<cmd>CopilotChatPrompts<cr>', 'CopilotChat: select prompt')
+
+  -- These take arguments, so no <cr> -- they leave the cmdline open to type in.
+  -- `:CopilotChat <text>` asks; bare `:CopilotChat` just opens the window.
+  -- NOTE: silent = false, otherwise the cmdline is hidden while you type.
+  local function cmdmap(lhs, rhs, desc, mode)
+    vim.keymap.set(mode or 'n', lhs, rhs, { silent = false, desc = desc })
+  end
+
+  cmdmap('<leader>pa', ':CopilotChat ', 'CopilotChat: ask')
+  cmdmap('<leader>pa', ":'<,'>CopilotChat ", 'CopilotChat: ask about selection', 'v')
+  cmdmap('<leader>pS', ':CopilotChatSave ', 'CopilotChat: save history')
+  cmdmap('<leader>pL', ':CopilotChatLoad ', 'CopilotChat: load history')
+
+  -- Prompt actions, normal + visual (the commands accept a range).
+  for lhs, cmd in pairs {
+    px = 'Explain',
+    pv = 'Review',
+    pf = 'Fix',
+    po = 'Optimize',
+    pD = 'Docs',
+    pT = 'Tests',
+    pC = 'Commit',
+  } do
+    aimap('<leader>' .. lhs, '<cmd>CopilotChat' .. cmd .. '<cr>', 'CopilotChat: ' .. cmd:lower(), { 'n', 'v' })
+  end
+end
+
 -- vim: ts=2 sts=2 sw=2 et
