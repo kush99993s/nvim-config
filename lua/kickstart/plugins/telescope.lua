@@ -9,7 +9,9 @@ return {
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
-    branch = '0.1.x',
+    -- Track master: the 0.1.x branch is frozen at 2024-05 and calls
+    -- vim.treesitter.language.ft_to_lang, which Neovim 0.12 removed.
+    -- After changing this, run :Lazy update telescope.nvim to refresh the lock.
     dependencies = {
       'nvim-lua/plenary.nvim',
       { -- If encountering errors, see telescope-fzf-native README for installation instructions
@@ -110,25 +112,25 @@ return {
         builtin.find_files { cwd = vim.fn.stdpath 'config' }
       end, { desc = '[S]earch [N]eovim files' })
 
-      vim.keymap.set('n', '<leader>sp', function()
-        builtin.find_files { cwd = '~/Documents/git/personal/personal_notes/personal' }
-      end, { desc = '[S]earch [M]y notes files' })
+      -- vim.keymap.set('n', '<leader>sp', function()
+      --   builtin.find_files { cwd = '~/Documents/git/personal/personal_notes/personal' }
+      -- end, { desc = '[S]earch [M]y notes files' })
 
-      vim.keymap.set('n', '<leader>st', function()
-        builtin.find_files { cwd = '~/Documents/git/personal/personal_notes/tech' }
-      end, { desc = '[S]earch [T]ech' })
+      -- vim.keymap.set('n', '<leader>st', function()
+      --   builtin.find_files { cwd = '~/Documents/git/personal/personal_notes/tech' }
+      -- end, { desc = '[S]earch [T]ech' })
 
-      -- NOTE: <leader>sw is [S]earch current [W]ord above; work notes moved to
-      -- <leader>sW so the two stop clobbering each other.
-      vim.keymap.set('n', '<leader>sW', function()
-        builtin.find_files { cwd = '~/Documents/git/personal/personal_notes/work/' }
-      end, { desc = '[S]earch [W]ork notes files' })
+      -- -- NOTE: <leader>sw is [S]earch current [W]ord above; work notes moved to
+      -- -- <leader>sW so the two stop clobbering each other.
+      -- vim.keymap.set('n', '<leader>sW', function()
+      --   builtin.find_files { cwd = '~/Documents/git/personal/personal_notes/work/' }
+      -- end, { desc = '[S]earch [W]ork notes files' })
 
-      vim.keymap.set('n', '<leader>seg', function()
-        require('telescope.builtin').live_grep {
-          cwd = vim.fn.expand '~/Documents/git/personal/personal_notes',
-        }
-      end, { desc = '[S]earch p[E]rsonal [G]rep files' })
+      -- vim.keymap.set('n', '<leader>seg', function()
+      --   require('telescope.builtin').live_grep {
+      --     cwd = vim.fn.expand '~/Documents/git/personal/personal_notes',
+      --   }
+      -- end, { desc = '[S]earch p[E]rsonal [G]rep files' })
 
       vim.keymap.set('n', '<leader>sq', function()
         builtin.find_files { cwd = '~/.config/dbconnector/sqlfile' }

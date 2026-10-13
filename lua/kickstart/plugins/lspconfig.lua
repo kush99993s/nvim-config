@@ -110,6 +110,14 @@ return {
           -- or a suggestion from your LSP for this to activate.
           map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
 
+          -- Show the parameters of the function call under the cursor.
+          -- Normal mode: <leader>cs. Insert mode: <C-s> while typing inside (...).
+          map('<leader>cs', vim.lsp.buf.signature_help, '[C]ode [S]ignature help')
+          vim.keymap.set('i', '<C-s>', vim.lsp.buf.signature_help, {
+            buffer = event.buf,
+            desc = 'LSP: Signature help',
+          })
+
           -- WARN: This is not Goto Definition, this is Goto Declaration.
           --  For example, in C this would take you to the header.
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
@@ -203,8 +211,21 @@ return {
         angularls = {},
         cssls = {},
         biome = {},
-        jedi_language_server = {},
-        pyright = {},
+        -- jedi_language_server is disabled: it competed with pyright and its
+        -- empty signature-help replies hid pyright's results.
+        pyright = {
+          -- Use the project's .venv so imports like snapds resolve. Without this,
+          -- pyright uses whatever `python` is on nvim's PATH, which usually lacks
+          -- the project's packages, and signature help comes back empty.
+          on_new_config = function(new_config, new_root_dir)
+            local venv_python = new_root_dir .. '/.venv/bin/python'
+            if vim.fn.executable(venv_python) == 1 then
+              new_config.settings = vim.tbl_deep_extend('force', new_config.settings or {}, {
+                python = { pythonPath = venv_python },
+              })
+            end
+          end,
+        },
         --        pylyzer = {
         --  cmd = { '--server' },
         --  cmd_env = {
@@ -347,7 +368,7 @@ return {
           -- server. nvim-lspconfig ships an `lsp/stylua.lua` that spawns
           -- `stylua --lsp`, which older stylua builds reject (exit code 2) on
           -- every Lua buffer with a `.stylua.toml` nearby.
-          exclude = { 'stylua' },
+          exclude = { 'stylua', 'jedi_language_server' },
         },
       }
     end,

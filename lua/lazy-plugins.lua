@@ -57,7 +57,7 @@ require('lazy').setup({
 
   'jpalardy/vim-slime',
 
-  require 'kickstart/plugins/personal_note_taking',
+  -- require 'kickstart/plugins/personal_note_taking',
 
   require 'kickstart/plugins/git',
 
